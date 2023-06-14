@@ -11,7 +11,6 @@ function Bread() {
             const URL = `${process.env.REACT_APP_BACKEND_URI}/breads/${id}`
             const response = await fetch(URL)
             const data = await response.json()
-            console.log(data)
             setBread(data)
         }
 
@@ -20,7 +19,9 @@ function Bread() {
 
     return (
         <div>
-            BREAD
+            <h1>{bread.name}</h1>
+            <p>Has Gluten: {bread.hasGluten}</p>
+            <img src={bread.image} alt={bread.name} height={300} />
         </div>
     )
 }
