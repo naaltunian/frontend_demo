@@ -1,14 +1,23 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 
-function New() {
+function UpdateBread() {
     const navigate = useNavigate()
 
-    const [breadInput, setBreadInput] = useState({
-        name: '',
-        hasGluten: true,
-        image: ''
-    })
+    const [breadInput, setBreadInput] = useState(null)
+    
+    const { id } = useParams()
+    const URL = `${process.env.REACT_APP_BACKEND_URI}/breads/${id}`
+
+    useEffect(() => {
+        const fetchData = async () => {
+            const response = await fetch(URL)
+            const data = await response.json()
+            setBreadInput(data)
+        }
+
+        fetchData()
+    }, [id, URL])
 
     const handleChange = (e) => {
         const value = e.target.value;
@@ -28,17 +37,16 @@ function New() {
 
     const handleSubmit = async (e) => {
         e.preventDefault()
-        const URL = `${process.env.REACT_APP_BACKEND_URI}/breads`
         const response = await fetch(URL, {
-            method: 'POST',
+            method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(breadInput)
         })
-        if (response.status !== 201) console.log('error!') // add error handling later
-        navigate('/')
+        if (response.status !== 204) console.log('error!') // add error handling later
+        navigate(`/bread/${id}`)
     }
 
-    return (
+    const display = breadInput && (
         <form onSubmit={handleSubmit}>
             <input required onChange={handleChange} value={breadInput.name} name='name' placeholder='name' />
             <input onChange={handleGlutenCheck} defaultChecked={breadInput.hasGluten} value={breadInput.hasGluten} name='hasGluten' type='checkbox' />
@@ -46,6 +54,12 @@ function New() {
             <input type='submit' />
         </form>
     )
+
+    return (
+        <div>
+            {display}
+        </div>
+    )
 }
 
-export default New
+export default UpdateBread
